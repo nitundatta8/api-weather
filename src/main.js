@@ -1,24 +1,45 @@
+import { WeatherService } from './../src/weather-service.js';
+
 $(document).ready(function() {
+
+
+    showWeatherGriphy();
+
+    function showWeatherGriphy(){
+      (async () => {
+        console.log("img1");
+        let weatherService = new WeatherService();
+        const response = await weatherService.getGiphyImg("weather");
+        displayGiphyImg(response);
+        console.log("img2");
+      })();
+    }
+   
+    function displayGiphyImg(response){
+      console.log("img3");
+      if (response) {
+        console.log("img4");
+        $('#showGiphyImg').attr("src",response.data[2].images.downsized.url);
+        console.log("img5");
+      } else {
+        console.log("img6");
+        $('.showError').text(`Please check your inputs and try again!`);
+      }
+    }
+
   $('#weatherLocation').click(function() {
     const city = $('#location').val();
     $('#location').val("");
 
-    fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=[[API-KEY-GOES-HERE]]`)
-      .then(function(response) {
-        if (response.ok && response.status == 200) {
-          return response.json();
-        } else {
-          return false;
-        }
-      })
-      .catch(function() {
-        return false;
-      })
-      .then(function(jsonifiedResponse) {
-        getElements(jsonifiedResponse);
-      });
+    (async () => {
+      let weatherService = new WeatherService();
+      const response = await weatherService.getWeatherByCity(city);
+      getElements(response);
+    })();
 
-    const getElements = function(response) {
+   
+
+    function getElements(response) {
       if (response) {
         $('.showHumidity').text(`The humidity in ${city} is ${response.main.humidity}%`);
         $('.showTemp').text(`The temperature in Kelvins is ${response.main.temp} degrees.`);
@@ -27,5 +48,6 @@ $(document).ready(function() {
         $('.showTemp').text(`Please check your inputs and try again!`);
       }
     }
+
   });
 });
